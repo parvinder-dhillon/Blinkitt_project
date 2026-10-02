@@ -1,0 +1,135 @@
+import { useForm } from "react-hook-form";
+import Axios from "../utils/Axios";
+import SummaryApi from "../common/SummaryApi";
+import AxiosToastError from "../utils/AxiosToastError";
+import toast from "react-hot-toast";
+import { IoClose } from "react-icons/io5";
+import { useGlobalContext } from "../Provider/GlobalProvider";
+
+const EditAddressDetails = ({ close, data }) => {
+  const { register, handleSubmit, reset } = useForm({
+    defaultValues : {
+        _id : data._id,
+        userId : data.userId,
+        address_line: data.address_line,
+        city: data.city,
+        state: data.state,
+        pincode: data.pincode,
+        country: data.country,
+        mobile: data.mobile,
+    }
+  });
+  const { fetchAddress } = useGlobalContext();
+
+  const onSubmit = async (data) => {
+    try {
+      const response = await Axios({
+        ...SummaryApi.updateAddress,
+        data: {
+          ...data,
+          address_line: data.address_line,
+          city: data.city,
+          state: data.state,
+          pincode: data.pincode,
+          country: data.country,
+          mobile: data.mobile,
+        },
+      });
+
+      const { data: responseData } = response;
+
+      if (responseData.success) {
+        toast.success(responseData.message);
+        if (close) {
+          close();
+          reset();
+          fetchAddress();
+        }
+      }
+    } catch (error) {
+      AxiosToastError(error);
+    }
+  };
+
+  return (
+    <section className="bg-black/70 fixed top-0 right-0 bottom-0 left-0 z-50">
+      <div className="bg-white p-4 w-full max-w-lg mt-8 mx-auto rounded h-screen overflow-auto">
+        <div className="flex justify-between items-center gap-4">
+          <h2 className="font-semibold">Add address</h2>
+          <button
+            onClick={close}
+            className="cursor-pointer hover:text-gray-500"
+          >
+            <IoClose size={25} />
+          </button>
+        </div>
+
+        <form className="mt-4 grid gap-4" onSubmit={handleSubmit(onSubmit)}>
+          <div className="grid gap-1">
+            <label htmlFor="address_line">Address Line : </label>
+            <input
+              type="text"
+              id="address_line"
+              className="border bg-blue-50 p-2 rounded focus-within:outline-yellow-400"
+              {...register("address_line", { required: true })}
+            />
+          </div>
+          <div className="grid gap-1">
+            <label htmlFor="city">City : </label>
+            <input
+              type="text"
+              id="city"
+              className="border bg-blue-50 p-2 rounded focus-within:outline-yellow-400"
+              {...register("city", { required: true })}
+            />
+          </div>
+          <div className="grid gap-1">
+            <label htmlFor="state">State : </label>
+            <input
+              type="text"
+              id="state"
+              className="border bg-blue-50 p-2 rounded focus-within:outline-yellow-400"
+              {...register("state", { required: true })}
+            />
+          </div>
+          <div className="grid gap-1">
+            <label htmlFor="pincode">Pincode : </label>
+            <input
+              type="text"
+              id="pincode"
+              className="border bg-blue-50 p-2 rounded focus-within:outline-yellow-400"
+              {...register("pincode", { required: true })}
+            />
+          </div>
+          <div className="grid gap-1">
+            <label htmlFor="country">Country : </label>
+            <input
+              type="text"
+              id="country"
+              className="border bg-blue-50 p-2 rounded focus-within:outline-yellow-400"
+              {...register("country", { required: true })}
+            />
+          </div>
+          <div className="grid gap-1">
+            <label htmlFor="mobile">Mobile No: </label>
+            <input
+              type="text"
+              id="mobile"
+              className="border bg-blue-50 p-2 rounded focus-within:outline-yellow-400"
+              {...register("mobile", { required: true })}
+            />
+          </div>
+
+          <button
+            type="onSubmit"
+            className="bg-yellow-400 w-full py-2 font-semibold hover:bg-yellow-300 cursor-pointer mt-4"
+          >
+            Submit
+          </button>
+        </form>
+      </div>
+    </section>
+  );
+};
+
+export default EditAddressDetails;
